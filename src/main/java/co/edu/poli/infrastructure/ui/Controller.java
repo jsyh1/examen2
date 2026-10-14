@@ -272,7 +272,7 @@ public final class Controller {
         txtFechaFin.setText(seguro.getFechaFin().toString());
         cbEstado.setValue(seguro.getEstado());
         cbTipo.setValue(seguro.getTipoSeguro());
-        cbAsegurado.getSelectionModel().select(seguro.getAsegurado());
+        seleccionarAseguradoPorId(seguro.getAsegurado().getId());
         if (seguro instanceof SeguroVida vida) {
             txtBeneficiario.setText(vida.getBeneficiario());
             txtCobertura.setText(vida.getValorCobertura().toPlainString());
@@ -283,6 +283,13 @@ public final class Controller {
             txtValorAsegurado.setText(vehiculo.getValorAsegurado().toPlainString());
         }
         lblResultado.setText("Editando póliza " + seguro.getNumeroPoliza());
+    }
+
+    private void seleccionarAseguradoPorId(int aseguradoId) {
+        cbAsegurado.getItems().stream()
+                .filter(asegurado -> asegurado.getId() == aseguradoId)
+                .findFirst()
+                .ifPresentOrElse(cbAsegurado::setValue, cbAsegurado.getSelectionModel()::clearSelection);
     }
 
     private void mostrarCamposTipo(String tipo) {

@@ -43,7 +43,7 @@ docs/uml/
 
 El dominio contiene las invariantes y no importa JavaFX ni JDBC. Los servicios de aplicación implementan los puertos de entrada y dependen del contrato `SeguroRepository`. `MysqlSeguroRepository` adapta ese puerto a JDBC/MySQL y `Controller` traduce interacciones JavaFX a casos de uso. `App` compone los adaptadores y entrega los casos de uso al controlador.
 
-`Seguro` es abstracto; `SeguroVida` y `SeguroVehiculo` aportan los datos particulares. Un asegurado puede asociarse a varios seguros. `EstadoSeguro` restringe transiciones: `PENDIENTE` puede pasar a `ACTIVO` o `CANCELADO`; `ACTIVO` puede pasar a `VENCIDO` o `CANCELADO`; `VENCIDO` y `CANCELADO` son terminales.
+`Seguro` es abstracto; `SeguroVida` añade `beneficiario` y `valorCobertura`, mientras que `SeguroVehiculo` añade placa, marca, modelo y valor asegurado. `parentesco` no forma parte del modelo definitivo porque no aparece entre los datos específicos requeridos para la póliza de vida. Un asegurado puede asociarse a varios seguros. `EstadoSeguro` restringe transiciones: `PENDIENTE` puede pasar a `ACTIVO` o `CANCELADO`; `ACTIVO` puede pasar a `VENCIDO` o `CANCELADO`; `VENCIDO` y `CANCELADO` son terminales.
 
 ## Base de datos
 

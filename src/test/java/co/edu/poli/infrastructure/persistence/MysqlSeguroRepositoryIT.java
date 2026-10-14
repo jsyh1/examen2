@@ -42,7 +42,12 @@ class MysqlSeguroRepositoryIT {
             assertInstanceOf(SeguroVehiculo.class, recuperado);
             assertEquals("TST123", ((SeguroVehiculo) recuperado).getPlaca());
             assertNotNull(recuperado.getAsegurado());
+            assertEquals(asegurado.getId(), recuperado.getAsegurado().getId());
             assertTrue(repository.buscarTodos().stream().anyMatch(seguro -> seguro.getId() == recuperado.getId()));
+                assertTrue(repository.eliminarPorId(id));
+                assertTrue(repository.buscarPorId(id).isEmpty());
+                assertTrue(repository.buscarAsegurados().stream()
+                    .anyMatch(registro -> registro.getId() == asegurado.getId()));
         } finally {
             if (id > 0) {
                 repository.eliminarPorId(id);

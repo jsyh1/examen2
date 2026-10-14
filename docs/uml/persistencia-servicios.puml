@@ -4,18 +4,36 @@ skinparam classAttributeIconSize 0
 hide empty members
 
 package "co.edu.poli.aplication.port.in" {
-  interface CrearSeguroUseCase
-  interface ConsultarSeguroPorIdUseCase
-  interface ListarSegurosUseCase
-  interface ActualizarSeguroUseCase
-  interface EliminarSeguroUseCase
+  interface CrearSeguroUseCase {
+    + crearSeguro(seguro: Seguro): Seguro
+  }
+  interface ConsultarSeguroPorIdUseCase {
+    + consultarPorId(id: int): Optional<Seguro>
+  }
+  interface ConsultarSeguroPorPolizaUseCase {
+    + consultarPorNumeroPoliza(numeroPoliza: String): Optional<Seguro>
+  }
+  interface ListarSegurosUseCase {
+    + listarSeguros(): List<Seguro>
+  }
+  interface ActualizarSeguroUseCase {
+    + actualizarSeguro(seguro: Seguro): Optional<Seguro>
+  }
+  interface EliminarSeguroUseCase {
+    + eliminarSeguro(id: int): boolean
+  }
+  interface ListarAseguradosUseCase {
+    + listarAsegurados(): List<Asegurado>
+  }
 }
 package "co.edu.poli.aplication.service" {
   class CrearSeguroService
   class ConsultarSeguroPorIdService
+  class ConsultarSeguroPorPolizaService
   class ListarSegurosService
   class ActualizarSeguroService
   class EliminarSeguroService
+  class ListarAseguradosService
 }
 package "co.edu.poli.aplication.port.out" {
   interface SeguroRepository
@@ -33,14 +51,18 @@ package "co.edu.poli.aplication.domain.model" {
 
 CrearSeguroUseCase <|.. CrearSeguroService
 ConsultarSeguroPorIdUseCase <|.. ConsultarSeguroPorIdService
+ConsultarSeguroPorPolizaUseCase <|.. ConsultarSeguroPorPolizaService
 ListarSegurosUseCase <|.. ListarSegurosService
 ActualizarSeguroUseCase <|.. ActualizarSeguroService
 EliminarSeguroUseCase <|.. EliminarSeguroService
+ListarAseguradosUseCase <|.. ListarAseguradosService
 CrearSeguroService --> SeguroRepository
 ConsultarSeguroPorIdService --> SeguroRepository
+ConsultarSeguroPorPolizaService --> SeguroRepository
 ListarSegurosService --> SeguroRepository
 ActualizarSeguroService --> SeguroRepository
 EliminarSeguroService --> SeguroRepository
+ListarAseguradosService --> SeguroRepository
 MysqlSeguroRepository ..|> SeguroRepository
 MysqlSeguroRepository --> ConexionDB
 MysqlSeguroRepository --> Seguro : mapea
