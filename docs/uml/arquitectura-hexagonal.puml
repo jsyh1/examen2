@@ -2,34 +2,70 @@
 !pragma layout smetana
 skinparam componentStyle rectangle
 
-package "Dominio" {
-  [Seguro / SeguroVida / SeguroVehiculo]
+package "co.edu.poli.aplication.domain.model" {
+  [Seguro abstracto]
+  [SeguroVida]
+  [SeguroVehiculo]
   [Asegurado]
   [EstadoSeguro]
+  [SeguroVida] --|> [Seguro abstracto]
+  [SeguroVehiculo] --|> [Seguro abstracto]
+  [Seguro abstracto] --> [Asegurado]
+  [Seguro abstracto] --> [EstadoSeguro]
 }
-package "Aplicación" {
-  [Puertos de entrada]
-  [Servicios de aplicación]
+package "co.edu.poli.aplication.port.in" {
+  interface "CrearSeguroUseCase" as Crear
+  interface "ConsultarSeguroPorIdUseCase" as ConsultarId
+  interface "ConsultarSeguroPorPolizaUseCase" as ConsultarPoliza
+  interface "ListarSegurosUseCase" as Listar
+  interface "ActualizarSeguroUseCase" as Actualizar
+  interface "EliminarSeguroUseCase" as Eliminar
+  interface "ListarAseguradosUseCase" as ListarAsegurados
+}
+package "co.edu.poli.aplication.service" {
+  [CrearSeguroService] as CrearService
+  [ConsultarSeguroPorIdService] as ConsultarIdService
+  [ConsultarSeguroPorPolizaService] as ConsultarPolizaService
+  [ListarSegurosService] as ListarService
+  [ActualizarSeguroService] as ActualizarService
+  [EliminarSeguroService] as EliminarService
+  [ListarAseguradosService] as ListarAseguradosService
+}
+package "co.edu.poli.aplication.port.out" {
   interface "SeguroRepository" as Repo
 }
-package "Adaptadores" {
-  [JavaFX Controller]
-  [MysqlSeguroRepository JDBC]
-  [MySQL]
+package "co.edu.poli.infrastructure" {
+  [Controller JavaFX] as Controller
+  [MysqlSeguroRepository JDBC] as MysqlRepository
+  [MySQL] as MySQL
 }
 
-[JavaFX Controller] --> [Puertos de entrada]
-[Puertos de entrada] <|.. [Servicios de aplicación]
-[Servicios de aplicación] --> Repo
-[MysqlSeguroRepository JDBC] ..|> Repo
-[MysqlSeguroRepository JDBC] --> [MySQL]
-[Servicios de aplicación] ..> [Seguro / SeguroVida / SeguroVehiculo]
-[Servicios de aplicación] ..> [Asegurado]
-[Seguro / SeguroVida / SeguroVehiculo] --> [Asegurado]
-[Seguro / SeguroVida / SeguroVehiculo] --> [EstadoSeguro]
+Controller --> Crear
+Controller --> ConsultarId
+Controller --> ConsultarPoliza
+Controller --> Listar
+Controller --> Actualizar
+Controller --> Eliminar
+Controller --> ListarAsegurados
+Crear <|.. CrearService
+ConsultarId <|.. ConsultarIdService
+ConsultarPoliza <|.. ConsultarPolizaService
+Listar <|.. ListarService
+Actualizar <|.. ActualizarService
+Eliminar <|.. EliminarService
+ListarAsegurados <|.. ListarAseguradosService
+CrearService --> Repo
+ConsultarIdService --> Repo
+ConsultarPolizaService --> Repo
+ListarService --> Repo
+ActualizarService --> Repo
+EliminarService --> Repo
+ListarAseguradosService --> Repo
+MysqlRepository ..|> Repo
+MysqlRepository --> MySQL
 
-note right of [Servicios de aplicación]
-  Depende del puerto de salida,
-  nunca de su adaptador JDBC.
+note right of Repo
+  Los servicios dependen de este puerto,
+  nunca de MysqlSeguroRepository.
 end note
 @enduml

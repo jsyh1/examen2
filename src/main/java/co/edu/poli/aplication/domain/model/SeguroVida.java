@@ -4,39 +4,36 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
-/** Póliza de vida con beneficiario y valor de cobertura. */
+/** Póliza de vida con beneficiario y parentesco. */
 public final class SeguroVida extends Seguro {
-    private final String beneficiario;
-    private final BigDecimal valorCobertura;
+    private final String nombreBeneficiario;
+    private final String parentesco;
 
     /**
      * Construye un seguro de vida con sus datos específicos.
      * @param id identificador, cero antes de persistir
      * @param numeroPoliza número único de póliza
-     * @param nombre nombre comercial
-     * @param descripcion descripción opcional
-     * @param valorPrima importe de la prima
-     * @param fechaInicio inicio de vigencia
-     * @param fechaFin fin de vigencia
+     * @param fechaExpedicion fecha de expedición
+     * @param valor valor monetario del seguro
      * @param estado estado de la póliza
      * @param asegurado titular de la póliza
-     * @param beneficiario persona beneficiaria
-     * @param valorCobertura importe cubierto
+     * @param nombreBeneficiario nombre de la persona beneficiaria
+     * @param parentesco relación del beneficiario con el asegurado
      */
-    public SeguroVida(int id, String numeroPoliza, String nombre, String descripcion,
-                      BigDecimal valorPrima, LocalDate fechaInicio, LocalDate fechaFin,
-                      EstadoSeguro estado, Asegurado asegurado, String beneficiario,
-                      BigDecimal valorCobertura) {
-        super(id, numeroPoliza, nombre, descripcion, valorPrima, fechaInicio, fechaFin, estado, asegurado);
-        Objects.requireNonNull(beneficiario, "El beneficiario es obligatorio.");
-        this.beneficiario = beneficiario.trim();
-        if (this.beneficiario.isEmpty()) {
-            throw new IllegalArgumentException("El beneficiario es obligatorio.");
+    public SeguroVida(int id, String numeroPoliza, LocalDate fechaExpedicion, BigDecimal valor,
+                      EstadoSeguro estado, Asegurado asegurado, String nombreBeneficiario, String parentesco) {
+        super(id, numeroPoliza, fechaExpedicion, valor, estado, asegurado);
+        this.nombreBeneficiario = obligatorio(nombreBeneficiario, "El nombre del beneficiario es obligatorio.");
+        this.parentesco = obligatorio(parentesco, "El parentesco del beneficiario es obligatorio.");
+    }
+
+    private static String obligatorio(String valor, String mensaje) {
+        Objects.requireNonNull(valor, mensaje);
+        String normalizado = valor.trim();
+        if (normalizado.isEmpty()) {
+            throw new IllegalArgumentException(mensaje);
         }
-        this.valorCobertura = Objects.requireNonNull(valorCobertura, "El valor de cobertura es obligatorio.");
-        if (valorCobertura.signum() <= 0) {
-            throw new IllegalArgumentException("El valor de cobertura debe ser mayor que cero.");
-        }
+        return normalizado;
     }
 
     @Override
@@ -49,10 +46,10 @@ public final class SeguroVida extends Seguro {
      * Devuelve el nombre del beneficiario.
      * @return beneficiario
      */
-    public String getBeneficiario() { return beneficiario; }
+    public String getNombreBeneficiario() { return nombreBeneficiario; }
     /**
-     * Devuelve el importe cubierto.
-     * @return cobertura
+     * Devuelve el parentesco del beneficiario.
+     * @return parentesco
      */
-    public BigDecimal getValorCobertura() { return valorCobertura; }
+    public String getParentesco() { return parentesco; }
 }

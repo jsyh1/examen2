@@ -7,41 +7,31 @@ package "co.edu.poli.aplication.domain.model" {
   abstract class Seguro {
     - id: int
     - numeroPoliza: String
-    - nombre: String
-    - descripcion: String
-    - valorPrima: BigDecimal
-    - fechaInicio: LocalDate
-    - fechaFin: LocalDate
+    - fechaExpedicion: LocalDate
+    - valor: BigDecimal
     - estado: EstadoSeguro
-    + cambiarEstado(nuevoEstado: EstadoSeguro): void
     + getTipoSeguro(): String
   }
   class SeguroVida {
-    - beneficiario: String
-    - valorCobertura: BigDecimal
+    - nombreBeneficiario: String
+    - parentesco: String
     + getTipoSeguro(): String
   }
   class SeguroVehiculo {
-    - placa: String
     - marca: String
-    - modelo: String
-    - valorAsegurado: BigDecimal
     + getTipoSeguro(): String
   }
   class Asegurado {
     - id: int
-    - tipoDocumento: String
-    - numeroDocumento: String
+    - identificacion: String
     - nombre: String
-    - telefono: String
-    - correo: String
+    - correoElectronico: String
   }
   enum EstadoSeguro {
     ACTIVO
     VENCIDO
     CANCELADO
     PENDIENTE
-    + permiteTransicionA(nuevoEstado: EstadoSeguro): boolean
   }
   Seguro <|-- SeguroVida
   Seguro <|-- SeguroVehiculo

@@ -24,11 +24,6 @@ public final class ActualizarSeguroService implements ActualizarSeguroUseCase {
         if (seguro.getId() <= 0) {
             throw new IllegalArgumentException("Selecciona un seguro existente para actualizar.");
         }
-        Optional<Seguro> existente = seguroRepository.buscarPorId(seguro.getId());
-        if (existente.isEmpty()) {
-            return Optional.empty();
-        }
-        existente.orElseThrow().cambiarEstado(seguro.getEstado());
         Optional<Seguro> coincidencia = seguroRepository.buscarPorNumeroPoliza(seguro.getNumeroPoliza());
         if (coincidencia.isPresent() && coincidencia.get().getId() != seguro.getId()) {
             throw new IllegalArgumentException("Ya existe otra póliza con ese número.");

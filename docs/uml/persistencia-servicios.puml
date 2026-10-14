@@ -43,10 +43,26 @@ package "co.edu.poli.infrastructure.persistence" {
   class ConexionDB
 }
 package "co.edu.poli.aplication.domain.model" {
-  abstract class Seguro
-  class SeguroVida
-  class SeguroVehiculo
-  class Asegurado
+  abstract class Seguro {
+    - id: int
+    - numeroPoliza: String
+    - fechaExpedicion: LocalDate
+    - valor: BigDecimal
+    - estado: EstadoSeguro
+  }
+  class SeguroVida {
+    - nombreBeneficiario: String
+    - parentesco: String
+  }
+  class SeguroVehiculo {
+    - marca: String
+  }
+  class Asegurado {
+    - id: int
+    - identificacion: String
+    - nombre: String
+    - correoElectronico: String
+  }
 }
 
 CrearSeguroUseCase <|.. CrearSeguroService

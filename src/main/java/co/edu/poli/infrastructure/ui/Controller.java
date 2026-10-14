@@ -27,24 +27,17 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
-import javafx.scene.control.TableCell;
 import javafx.beans.property.ReadOnlyStringWrapper;
 
 /** Adaptador JavaFX: traduce acciones de la vista a casos de uso. */
 public final class Controller {
     @FXML private TextField txtId;
     @FXML private TextField txtNumeroPoliza;
-    @FXML private TextField txtNombre;
-    @FXML private TextField txtDescripcion;
-    @FXML private TextField txtPrima;
-    @FXML private TextField txtFechaInicio;
-    @FXML private TextField txtFechaFin;
-    @FXML private TextField txtBeneficiario;
-    @FXML private TextField txtCobertura;
-    @FXML private TextField txtPlaca;
+    @FXML private TextField txtFechaExpedicion;
+    @FXML private TextField txtValor;
+    @FXML private TextField txtNombreBeneficiario;
+    @FXML private TextField txtParentesco;
     @FXML private TextField txtMarca;
-    @FXML private TextField txtModelo;
-    @FXML private TextField txtValorAsegurado;
     @FXML private TextField txtBusqueda;
     @FXML private ChoiceBox<String> cbTipo;
     @FXML private ChoiceBox<EstadoSeguro> cbEstado;
@@ -56,10 +49,11 @@ public final class Controller {
     @FXML private TableView<Seguro> tblSeguros;
     @FXML private TableColumn<Seguro, Integer> colId;
     @FXML private TableColumn<Seguro, String> colPoliza;
+    @FXML private TableColumn<Seguro, String> colFechaExpedicion;
+    @FXML private TableColumn<Seguro, String> colValor;
     @FXML private TableColumn<Seguro, String> colTipo;
     @FXML private TableColumn<Seguro, String> colAsegurado;
     @FXML private TableColumn<Seguro, String> colEstado;
-    @FXML private TableColumn<Seguro, String> colVigencia;
 
     private final CrearSeguroUseCase crearSeguro;
     private final ConsultarSeguroPorIdUseCase consultarPorId;
@@ -96,11 +90,12 @@ public final class Controller {
                 (observable, anterior, actual) -> mostrarCamposTipo(actual));
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colPoliza.setCellValueFactory(new PropertyValueFactory<>("numeroPoliza"));
+        colFechaExpedicion.setCellValueFactory(cell -> new ReadOnlyStringWrapper(
+            cell.getValue().getFechaExpedicion().toString()));
+        colValor.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().getValor().toPlainString()));
         colTipo.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().getTipoSeguro()));
         colAsegurado.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().getAsegurado().getNombre()));
         colEstado.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().getEstado().name()));
-        colVigencia.setCellValueFactory(cell -> new ReadOnlyStringWrapper(
-                cell.getValue().getFechaInicio() + " a " + cell.getValue().getFechaFin()));
         tblSeguros.getSelectionModel().selectedItemProperty().addListener(
                 (observable, anterior, seleccionado) -> mostrarSeguro(seleccionado));
         mostrarCamposTipo("VIDA");
@@ -220,19 +215,14 @@ public final class Controller {
             throw new IllegalArgumentException("No hay asegurados disponibles en la base de datos.");
         }
         String numero = txtNumeroPoliza.getText().trim();
-        String nombre = txtNombre.getText().trim();
-        String descripcion = txtDescripcion.getText();
-        BigDecimal prima = decimal(txtPrima.getText(), "La prima");
-        LocalDate inicio = fecha(txtFechaInicio.getText(), "La fecha de inicio");
-        LocalDate fin = fecha(txtFechaFin.getText(), "La fecha de fin");
+        LocalDate fechaExpedicion = fecha(txtFechaExpedicion.getText(), "La fecha de expedición");
+        BigDecimal valor = decimal(txtValor.getText(), "El valor del seguro");
         EstadoSeguro estado = cbEstado.getValue();
         if ("VIDA".equals(tipo)) {
-            return new SeguroVida(id, numero, nombre, descripcion, prima, inicio, fin, estado, asegurado,
-                    txtBeneficiario.getText(), decimal(txtCobertura.getText(), "La cobertura"));
+            return new SeguroVida(id, numero, fechaExpedicion, valor, estado, asegurado,
+                txtNombreBeneficiario.getText(), txtParentesco.getText());
         }
-        return new SeguroVehiculo(id, numero, nombre, descripcion, prima, inicio, fin, estado, asegurado,
-                txtPlaca.getText(), txtMarca.getText(), txtModelo.getText(),
-                decimal(txtValorAsegurado.getText(), "El valor asegurado"));
+        return new SeguroVehiculo(id, numero, fechaExpedicion, valor, estado, asegurado, txtMarca.getText());
     }
 
     private BigDecimal decimal(String texto, String campo) {
@@ -265,22 +255,16 @@ public final class Controller {
         }
         txtId.setText(String.valueOf(seguro.getId()));
         txtNumeroPoliza.setText(seguro.getNumeroPoliza());
-        txtNombre.setText(seguro.getNombre());
-        txtDescripcion.setText(seguro.getDescripcion());
-        txtPrima.setText(seguro.getValorPrima().toPlainString());
-        txtFechaInicio.setText(seguro.getFechaInicio().toString());
-        txtFechaFin.setText(seguro.getFechaFin().toString());
+        txtFechaExpedicion.setText(seguro.getFechaExpedicion().toString());
+        txtValor.setText(seguro.getValor().toPlainString());
         cbEstado.setValue(seguro.getEstado());
         cbTipo.setValue(seguro.getTipoSeguro());
         seleccionarAseguradoPorId(seguro.getAsegurado().getId());
         if (seguro instanceof SeguroVida vida) {
-            txtBeneficiario.setText(vida.getBeneficiario());
-            txtCobertura.setText(vida.getValorCobertura().toPlainString());
+            txtNombreBeneficiario.setText(vida.getNombreBeneficiario());
+            txtParentesco.setText(vida.getParentesco());
         } else if (seguro instanceof SeguroVehiculo vehiculo) {
-            txtPlaca.setText(vehiculo.getPlaca());
             txtMarca.setText(vehiculo.getMarca());
-            txtModelo.setText(vehiculo.getModelo());
-            txtValorAsegurado.setText(vehiculo.getValorAsegurado().toPlainString());
         }
         lblResultado.setText("Editando póliza " + seguro.getNumeroPoliza());
     }
@@ -303,17 +287,11 @@ public final class Controller {
     private void limpiarFormulario() {
         txtId.clear();
         txtNumeroPoliza.clear();
-        txtNombre.clear();
-        txtDescripcion.clear();
-        txtPrima.clear();
-        txtFechaInicio.clear();
-        txtFechaFin.clear();
-        txtBeneficiario.clear();
-        txtCobertura.clear();
-        txtPlaca.clear();
+        txtFechaExpedicion.clear();
+        txtValor.clear();
+        txtNombreBeneficiario.clear();
+        txtParentesco.clear();
         txtMarca.clear();
-        txtModelo.clear();
-        txtValorAsegurado.clear();
         cbEstado.setValue(EstadoSeguro.PENDIENTE);
     }
 

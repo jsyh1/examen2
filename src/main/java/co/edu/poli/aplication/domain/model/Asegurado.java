@@ -8,35 +8,28 @@ public final class Asegurado {
     private static final Pattern CORREO_VALIDO = Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
 
     private final int id;
-    private final String tipoDocumento;
-    private final String numeroDocumento;
+    private final String identificacion;
     private final String nombre;
-    private final String telefono;
-    private final String correo;
+    private final String correoElectronico;
 
     /**
      * Construye un asegurado existente en el catálogo de la base de datos.
      *
      * @param id identificador positivo
-     * @param tipoDocumento tipo de documento
-     * @param numeroDocumento número de documento
+     * @param identificacion identificación única
      * @param nombre nombre completo
-     * @param telefono teléfono de contacto
-     * @param correo correo electrónico
+     * @param correoElectronico correo electrónico
      */
-    public Asegurado(int id, String tipoDocumento, String numeroDocumento, String nombre,
-                     String telefono, String correo) {
+    public Asegurado(int id, String identificacion, String nombre, String correoElectronico) {
         if (id <= 0) {
             throw new IllegalArgumentException("El ID del asegurado debe ser positivo.");
         }
         this.id = id;
-        this.tipoDocumento = obligatorio(tipoDocumento, "El tipo de documento es obligatorio.");
-        this.numeroDocumento = obligatorio(numeroDocumento, "El número de documento es obligatorio.");
+        this.identificacion = obligatorio(identificacion, "La identificación del asegurado es obligatoria.");
         this.nombre = obligatorio(nombre, "El nombre del asegurado es obligatorio.");
-        this.telefono = obligatorio(telefono, "El teléfono del asegurado es obligatorio.");
-        this.correo = obligatorio(correo, "El correo del asegurado es obligatorio.");
-        if (!CORREO_VALIDO.matcher(this.correo).matches()) {
-            throw new IllegalArgumentException("El correo del asegurado no tiene un formato válido.");
+        this.correoElectronico = obligatorio(correoElectronico, "El correo electrónico es obligatorio.");
+        if (!CORREO_VALIDO.matcher(this.correoElectronico).matches()) {
+            throw new IllegalArgumentException("El correo electrónico no tiene un formato válido.");
         }
     }
 
@@ -58,12 +51,7 @@ public final class Asegurado {
      * Devuelve el tipo de documento.
      * @return tipo documental
      */
-    public String getTipoDocumento() { return tipoDocumento; }
-    /**
-     * Devuelve el número de documento.
-     * @return número documental
-     */
-    public String getNumeroDocumento() { return numeroDocumento; }
+    public String getIdentificacion() { return identificacion; }
     /**
      * Devuelve el nombre completo.
      * @return nombre
@@ -73,15 +61,9 @@ public final class Asegurado {
      * Devuelve el teléfono de contacto.
      * @return teléfono
      */
-    public String getTelefono() { return telefono; }
-    /**
-     * Devuelve el correo electrónico validado.
-     * @return correo
-     */
-    public String getCorreo() { return correo; }
-
+    public String getCorreoElectronico() { return correoElectronico; }
     @Override
     public String toString() {
-        return nombre + " - " + tipoDocumento + " " + numeroDocumento;
+        return nombre + " - " + identificacion;
     }
 }

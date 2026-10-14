@@ -33,36 +33,24 @@
                     <TextField fx:id="txtNumeroPoliza" promptText="POL-2026-001" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
                     <Label text="Tipo" GridPane.columnIndex="4" GridPane.rowIndex="0"/>
                     <ChoiceBox fx:id="cbTipo" prefWidth="140" GridPane.columnIndex="5" GridPane.rowIndex="0"/>
-                    <Label text="Asegurado" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                    <ComboBox fx:id="cbAsegurado" prefWidth="230" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="2"/>
-                    <Label text="Estado" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
-                    <ChoiceBox fx:id="cbEstado" prefWidth="150" GridPane.columnIndex="4" GridPane.rowIndex="1" GridPane.columnSpan="2"/>
-                    <Label text="Nombre" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                    <TextField fx:id="txtNombre" promptText="Nombre del seguro" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="2"/>
-                    <Label text="Prima" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
-                    <TextField fx:id="txtPrima" promptText="0.00" GridPane.columnIndex="4" GridPane.rowIndex="2" GridPane.columnSpan="2"/>
-                    <Label text="Descripción" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-                    <TextField fx:id="txtDescripcion" promptText="Descripción" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.columnSpan="5"/>
-                    <Label text="Inicio (AAAA-MM-DD)" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
-                    <TextField fx:id="txtFechaInicio" promptText="2026-01-01" GridPane.columnIndex="1" GridPane.rowIndex="4" GridPane.columnSpan="2"/>
-                    <Label text="Fin (AAAA-MM-DD)" GridPane.columnIndex="3" GridPane.rowIndex="4"/>
-                    <TextField fx:id="txtFechaFin" promptText="2027-01-01" GridPane.columnIndex="4" GridPane.rowIndex="4" GridPane.columnSpan="2"/>
+                    <Label text="Fecha de expedición" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <TextField fx:id="txtFechaExpedicion" promptText="AAAA-MM-DD" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="2"/>
+                    <Label text="Valor" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+                    <TextField fx:id="txtValor" promptText="0.00" GridPane.columnIndex="4" GridPane.rowIndex="1" GridPane.columnSpan="2"/>
+                    <Label text="Estado" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                    <ChoiceBox fx:id="cbEstado" prefWidth="150" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="2"/>
+                    <Label text="Asegurado" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
+                    <ComboBox fx:id="cbAsegurado" prefWidth="230" GridPane.columnIndex="4" GridPane.rowIndex="2" GridPane.columnSpan="2"/>
                 </GridPane>
                 <GridPane fx:id="camposVida" hgap="12" vgap="8">
-                    <Label text="Beneficiario" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                    <TextField fx:id="txtBeneficiario" promptText="Nombre del beneficiario" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-                    <Label text="Cobertura" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
-                    <TextField fx:id="txtCobertura" promptText="0.00" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+                    <Label text="Nombre del beneficiario" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <TextField fx:id="txtNombreBeneficiario" promptText="Nombre completo" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <Label text="Parentesco" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                    <TextField fx:id="txtParentesco" promptText="Parentesco" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
                 </GridPane>
                 <GridPane fx:id="camposVehiculo" hgap="12" vgap="8" visible="false" managed="false">
-                    <Label text="Placa" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                    <TextField fx:id="txtPlaca" promptText="ABC123" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-                    <Label text="Marca" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
-                    <TextField fx:id="txtMarca" promptText="Marca" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
-                    <Label text="Modelo" GridPane.columnIndex="4" GridPane.rowIndex="0"/>
-                    <TextField fx:id="txtModelo" promptText="Modelo" GridPane.columnIndex="5" GridPane.rowIndex="0"/>
-                    <Label text="Valor asegurado" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                    <TextField fx:id="txtValorAsegurado" promptText="0.00" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="2"/>
+                    <Label text="Marca" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <TextField fx:id="txtMarca" promptText="Marca del vehículo" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
                 </GridPane>
                 <HBox spacing="8">
                     <Button text="Nuevo" onAction="#nuevoSeguro"/>
@@ -88,9 +76,10 @@
                         <TableColumn fx:id="colId" text="ID" prefWidth="55"/>
                         <TableColumn fx:id="colPoliza" text="Póliza" prefWidth="150"/>
                         <TableColumn fx:id="colTipo" text="Tipo" prefWidth="100"/>
+                        <TableColumn fx:id="colFechaExpedicion" text="Expedición" prefWidth="130"/>
+                        <TableColumn fx:id="colValor" text="Valor" prefWidth="100"/>
                         <TableColumn fx:id="colAsegurado" text="Asegurado" prefWidth="190"/>
                         <TableColumn fx:id="colEstado" text="Estado" prefWidth="100"/>
-                        <TableColumn fx:id="colVigencia" text="Vigencia" prefWidth="220"/>
                     </columns>
                 </TableView>
             </VBox>

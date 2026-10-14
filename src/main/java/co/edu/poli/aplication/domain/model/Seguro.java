@@ -8,44 +8,31 @@ import java.util.Objects;
 public abstract class Seguro {
     private final int id;
     private final String numeroPoliza;
-    private final String nombre;
-    private final String descripcion;
-    private final BigDecimal valorPrima;
-    private final LocalDate fechaInicio;
-    private final LocalDate fechaFin;
-    private EstadoSeguro estado;
+    private final LocalDate fechaExpedicion;
+    private final BigDecimal valor;
+    private final EstadoSeguro estado;
     private final Asegurado asegurado;
 
     /**
      * Construye una póliza y valida sus invariantes comunes.
      * @param id identificador, cero para una póliza nueva
      * @param numeroPoliza número único de póliza
-     * @param nombre nombre comercial
-     * @param descripcion descripción opcional
-     * @param valorPrima importe de la prima
-     * @param fechaInicio inicio de vigencia
-     * @param fechaFin fin de vigencia
-     * @param estado estado inicial o actual
+     * @param fechaExpedicion fecha de expedición
+     * @param valor valor monetario del seguro
+     * @param estado estado de la póliza
      * @param asegurado titular de la póliza
      */
-    protected Seguro(int id, String numeroPoliza, String nombre, String descripcion,
-                     BigDecimal valorPrima, LocalDate fechaInicio, LocalDate fechaFin,
-                     EstadoSeguro estado, Asegurado asegurado) {
+    protected Seguro(int id, String numeroPoliza, LocalDate fechaExpedicion,
+                     BigDecimal valor, EstadoSeguro estado, Asegurado asegurado) {
         if (id < 0) {
             throw new IllegalArgumentException("El ID del seguro no puede ser negativo.");
         }
         this.id = id;
         this.numeroPoliza = obligatorio(numeroPoliza, "El número de póliza es obligatorio.");
-        this.nombre = obligatorio(nombre, "El nombre del seguro es obligatorio.");
-        this.descripcion = descripcion == null ? "" : descripcion.trim();
-        this.valorPrima = Objects.requireNonNull(valorPrima, "El valor de la prima es obligatorio.");
-        if (valorPrima.signum() < 0) {
-            throw new IllegalArgumentException("La prima no puede ser negativa.");
-        }
-        this.fechaInicio = Objects.requireNonNull(fechaInicio, "La fecha de inicio es obligatoria.");
-        this.fechaFin = Objects.requireNonNull(fechaFin, "La fecha de fin es obligatoria.");
-        if (fechaFin.isBefore(fechaInicio)) {
-            throw new IllegalArgumentException("La fecha de fin no puede ser anterior a la fecha de inicio.");
+        this.fechaExpedicion = Objects.requireNonNull(fechaExpedicion, "La fecha de expedición es obligatoria.");
+        this.valor = Objects.requireNonNull(valor, "El valor del seguro es obligatorio.");
+        if (valor.signum() < 0) {
+            throw new IllegalArgumentException("El valor del seguro no puede ser negativo.");
         }
         this.estado = Objects.requireNonNull(estado, "El estado del seguro es obligatorio.");
         this.asegurado = Objects.requireNonNull(asegurado, "Debe seleccionar un asegurado.");
@@ -58,17 +45,6 @@ public abstract class Seguro {
             throw new IllegalArgumentException(mensaje);
         }
         return normalizado;
-    }
-
-    /**
-     * Cambia el estado respetando las transiciones del dominio.
-     * @param nuevoEstado estado de destino permitido
-     */
-    public void cambiarEstado(EstadoSeguro nuevoEstado) {
-        if (!estado.permiteTransicionA(nuevoEstado)) {
-            throw new IllegalArgumentException("Transición de estado no permitida: " + estado + " a " + nuevoEstado + ".");
-        }
-        estado = nuevoEstado;
     }
 
     /**
@@ -88,30 +64,15 @@ public abstract class Seguro {
      */
     public String getNumeroPoliza() { return numeroPoliza; }
     /**
-     * Devuelve el nombre comercial.
-     * @return nombre
+     * Devuelve la fecha en que se expidió la póliza.
+     * @return fecha de expedición
      */
-    public String getNombre() { return nombre; }
+    public LocalDate getFechaExpedicion() { return fechaExpedicion; }
     /**
-     * Devuelve la descripción.
-     * @return descripción
+     * Devuelve el valor monetario del seguro.
+     * @return valor
      */
-    public String getDescripcion() { return descripcion; }
-    /**
-     * Devuelve el importe de la prima.
-     * @return prima
-     */
-    public BigDecimal getValorPrima() { return valorPrima; }
-    /**
-     * Devuelve el inicio de vigencia.
-     * @return fecha inicial
-     */
-    public LocalDate getFechaInicio() { return fechaInicio; }
-    /**
-     * Devuelve el fin de vigencia.
-     * @return fecha final
-     */
-    public LocalDate getFechaFin() { return fechaFin; }
+    public BigDecimal getValor() { return valor; }
     /**
      * Devuelve el estado actual.
      * @return estado

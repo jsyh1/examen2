@@ -24,10 +24,13 @@ public final class ConexionDB {
         String host = valor("DB_HOST", "localhost");
         String puerto = valor("DB_PORT", "3307");
         String baseDatos = valor("DB_NAME", "seguros");
-        String usuario = valor("DB_USER", "root");
-        String contrasena = valor("DB_PASSWORD", "jsyhXD7$");
+        String usuario = valor("DB_USER", null);
+        String contrasena = valor("DB_PASSWORD", null);
         if (usuario == null || usuario.isBlank()) {
             throw new SQLException("La variable DB_USER no está configurada.");
+        }
+        if (contrasena == null) {
+            throw new SQLException("La variable DB_PASSWORD no está configurada.");
         }
         String url = "jdbc:mysql://" + host + ":" + puerto + "/" + baseDatos
                 + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";

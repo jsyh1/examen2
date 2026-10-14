@@ -9,6 +9,10 @@ import co.edu.poli.aplication.domain.model.EstadoSeguro;
 import co.edu.poli.aplication.domain.model.Seguro;
 import co.edu.poli.aplication.domain.model.SeguroVehiculo;
 import co.edu.poli.aplication.domain.model.SeguroVida;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -19,38 +23,65 @@ import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 @EnabledIfSystemProperty(named = "mysql.integration", matches = "true")
 class MysqlSeguroRepositoryIT {
     @Test
-    void creaConsultaActualizaYEliminaAmbosSubtipos() {
+    void conservaSubtiposRelacionesYDetalleEnElCrud() throws SQLException {
         MysqlSeguroRepository repository = new MysqlSeguroRepository();
         Asegurado asegurado = repository.buscarAsegurados().stream().findFirst()
                 .orElseThrow(() -> new IllegalStateException("El catálogo MySQL requiere al menos un asegurado."));
-        String numero = "IT-" + UUID.randomUUID();
-        int id = 0;
+        String numeroVida = "IT-V-" + UUID.randomUUID();
+        String numeroVehiculo = "IT-A-" + UUID.randomUUID();
+        int vidaId = 0;
+        int vehiculoId = 0;
         try {
-            SeguroVida vida = new SeguroVida(0, numero, "Vida integración", "Prueba", BigDecimal.TEN,
-                    LocalDate.of(2026, 1, 1), LocalDate.of(2027, 1, 1), EstadoSeguro.PENDIENTE,
-                    asegurado, "Beneficiario de prueba", BigDecimal.valueOf(50000));
-            Seguro creado = repository.guardar(vida);
-            id = creado.getId();
-            assertTrue(id > 0);
-            assertInstanceOf(SeguroVida.class, repository.buscarPorId(id).orElseThrow());
+            SeguroVida vida = new SeguroVida(0, numeroVida, LocalDate.of(2026, 8, 21), BigDecimal.TEN,
+                    EstadoSeguro.PENDIENTE, asegurado, "Beneficiario de prueba", "Hija");
+            Seguro creadoVida = repository.guardar(vida);
+            vidaId = creadoVida.getId();
+            assertTrue(vidaId > 0);
+            SeguroVida vidaRecuperada = assertInstanceOf(SeguroVida.class,
+                    repository.buscarPorId(vidaId).orElseThrow());
+            assertEquals("Beneficiario de prueba", vidaRecuperada.getNombreBeneficiario());
+            assertEquals("Hija", vidaRecuperada.getParentesco());
+            assertEquals(asegurado.getId(), vidaRecuperada.getAsegurado().getId());
 
-            SeguroVehiculo actualizado = new SeguroVehiculo(id, numero, "Vehículo integración", "Actualizada",
-                    BigDecimal.valueOf(25), LocalDate.of(2026, 1, 1), LocalDate.of(2027, 1, 1),
-                    EstadoSeguro.PENDIENTE, asegurado, "TST123", "Marca", "Modelo", BigDecimal.valueOf(9000));
+            SeguroVehiculo segundoSeguro = new SeguroVehiculo(0, numeroVehiculo, LocalDate.of(2026, 8, 22),
+                    BigDecimal.valueOf(25), EstadoSeguro.ACTIVO, asegurado, "Marca segunda");
+            vehiculoId = repository.guardar(segundoSeguro).getId();
+            assertEquals(2, repository.buscarTodos().stream()
+                    .filter(seguro -> seguro.getAsegurado().getId() == asegurado.getId()).count());
+
+            SeguroVehiculo actualizado = new SeguroVehiculo(vidaId, numeroVida, LocalDate.of(2026, 8, 23),
+                    BigDecimal.valueOf(30), EstadoSeguro.CANCELADO, asegurado, "Marca actualizada");
             assertTrue(repository.actualizar(actualizado).isPresent());
-            Seguro recuperado = repository.buscarPorNumeroPoliza(numero).orElseThrow();
+            Seguro recuperado = repository.buscarPorNumeroPoliza(numeroVida).orElseThrow();
             assertInstanceOf(SeguroVehiculo.class, recuperado);
-            assertEquals("TST123", ((SeguroVehiculo) recuperado).getPlaca());
-            assertNotNull(recuperado.getAsegurado());
+            assertEquals("Marca actualizada", ((SeguroVehiculo) recuperado).getMarca());
             assertEquals(asegurado.getId(), recuperado.getAsegurado().getId());
-            assertTrue(repository.buscarTodos().stream().anyMatch(seguro -> seguro.getId() == recuperado.getId()));
-                assertTrue(repository.eliminarPorId(id));
-                assertTrue(repository.buscarPorId(id).isEmpty());
-                assertTrue(repository.buscarAsegurados().stream()
+            assertEquals(0, contarDetalle("seguros_vida", vidaId));
+            assertEquals(1, contarDetalle("seguros_vehiculo", vidaId));
+
+            assertTrue(repository.eliminarPorId(vidaId));
+            assertTrue(repository.buscarPorId(vidaId).isEmpty());
+            assertNotNull(repository.buscarPorId(vehiculoId).orElse(null));
+            assertTrue(repository.buscarAsegurados().stream()
                     .anyMatch(registro -> registro.getId() == asegurado.getId()));
         } finally {
-            if (id > 0) {
-                repository.eliminarPorId(id);
+            if (vidaId > 0) {
+                repository.eliminarPorId(vidaId);
+            }
+            if (vehiculoId > 0) {
+                repository.eliminarPorId(vehiculoId);
+            }
+        }
+    }
+
+    private int contarDetalle(String tabla, int seguroId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM " + tabla + " WHERE seguro_id = ?";
+        try (Connection connection = new ConexionDB().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, seguroId);
+            try (ResultSet result = statement.executeQuery()) {
+                result.next();
+                return result.getInt(1);
             }
         }
     }

@@ -40,20 +40,14 @@ class SeguroServiceTest {
     }
 
     @Test
-    void actualizarRechazaTransicionDeEstadoInvalida() {
+    void actualizarPermiteModificarEstadoComoParteDelCrud() {
         FakeSeguroRepository repository = new FakeSeguroRepository();
         repository.seguros.add(seguro(1, "POL-1", EstadoSeguro.PENDIENTE));
 
-        assertThrows(IllegalArgumentException.class,
-                () -> new ActualizarSeguroService(repository).actualizarSeguro(
-                        seguro(1, "POL-1", EstadoSeguro.VENCIDO)));
-    }
+        var actualizado = new ActualizarSeguroService(repository)
+                .actualizarSeguro(seguro(1, "POL-1", EstadoSeguro.CANCELADO));
 
-    @Test
-    void crearNoPermiteEstadosTerminalesComoEstadoInicial() {
-        FakeSeguroRepository repository = new FakeSeguroRepository();
-        assertThrows(IllegalArgumentException.class,
-                () -> new CrearSeguroService(repository).crearSeguro(seguro(0, "POL-3", EstadoSeguro.CANCELADO)));
+        assertEquals(EstadoSeguro.CANCELADO, actualizado.orElseThrow().getEstado());
     }
 
     @Test
@@ -67,10 +61,9 @@ class SeguroServiceTest {
     }
 
     private SeguroVida seguro(int id, String numero, EstadoSeguro estado) {
-        Asegurado asegurado = new Asegurado(1, "CC", "100", "Ana Pérez", "3000000000", "ana@example.com");
-        return new SeguroVida(id, numero, "Vida", "", BigDecimal.TEN,
-                LocalDate.of(2026, 1, 1), LocalDate.of(2027, 1, 1), estado,
-                asegurado, "Beneficiario", BigDecimal.valueOf(10000));
+        Asegurado asegurado = new Asegurado(1, "ID-100", "Ana Pérez", "ana@example.com");
+        return new SeguroVida(id, numero, LocalDate.of(2026, 8, 21), BigDecimal.TEN,
+            estado, asegurado, "Beneficiario", "Hija");
     }
 
     private static final class FakeSeguroRepository implements SeguroRepository {

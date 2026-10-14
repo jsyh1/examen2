@@ -7,47 +7,59 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
 class SeguroDomainTest {
-    private final Asegurado asegurado = new Asegurado(1, "CC", "100", "Ana Pérez", "3001234567", "ana@example.com");
+    private final Asegurado asegurado = new Asegurado(1, "ID-100", "Ana Pérez", "ana@example.com");
 
     @Test
-    void rechazaPrimaNegativa() {
-        assertThrows(IllegalArgumentException.class, () -> crearVida(new BigDecimal("-1"),
-                LocalDate.of(2026, 1, 1), LocalDate.of(2026, 2, 1)));
+    void conservaCamposComunesConSusTipos() {
+    Seguro vida = crearVida(new BigDecimal("1250.50"));
+    assertEquals("POL-VIDA", vida.getNumeroPoliza());
+    assertEquals(LocalDate.of(2026, 8, 21), vida.getFechaExpedicion());
+    assertEquals(new BigDecimal("1250.50"), vida.getValor());
+    assertEquals(EstadoSeguro.ACTIVO, vida.getEstado());
+    assertEquals(asegurado.getId(), vida.getAsegurado().getId());
     }
 
     @Test
-    void rechazaFechasInvertidas() {
-        assertThrows(IllegalArgumentException.class, () -> crearVida(BigDecimal.ONE,
-                LocalDate.of(2026, 2, 1), LocalDate.of(2026, 1, 1)));
+    void rechazaIdentificacionNombreOCorreoInvalidos() {
+    assertThrows(IllegalArgumentException.class,
+        () -> new Asegurado(2, " ", "Ana", "ana@example.com"));
+    assertThrows(IllegalArgumentException.class,
+        () -> new Asegurado(2, "ID-2", " ", "ana@example.com"));
+    assertThrows(IllegalArgumentException.class,
+        () -> new Asegurado(2, "ID-2", "Ana", "correo-invalido"));
     }
 
     @Test
-    void rechazaCorreoDeAseguradoInvalido() {
-        assertThrows(IllegalArgumentException.class,
-                () -> new Asegurado(2, "CC", "200", "Luis", "3000000000", "correo-invalido"));
+    void rechazaNumeroFechaYValorInvalidos() {
+    assertThrows(IllegalArgumentException.class, () -> new SeguroVehiculo(0, " ",
+        LocalDate.of(2026, 8, 21), BigDecimal.ONE, EstadoSeguro.ACTIVO, asegurado, "Marca"));
+    assertThrows(NullPointerException.class, () -> new SeguroVehiculo(0, "POL-1", null,
+        BigDecimal.ONE, EstadoSeguro.ACTIVO, asegurado, "Marca"));
+    assertThrows(IllegalArgumentException.class, () -> new SeguroVehiculo(0, "POL-1",
+        LocalDate.of(2026, 8, 21), new BigDecimal("-0.01"), EstadoSeguro.ACTIVO, asegurado, "Marca"));
     }
 
     @Test
-    void transicionesDeEstadoRespetanReglas() {
-        Seguro vida = crearVida(new BigDecimal("100.00"), LocalDate.of(2026, 1, 1), LocalDate.of(2027, 1, 1));
-        vida.cambiarEstado(EstadoSeguro.VENCIDO);
-        assertEquals(EstadoSeguro.VENCIDO, vida.getEstado());
-        assertThrows(IllegalArgumentException.class, () -> vida.cambiarEstado(EstadoSeguro.ACTIVO));
+    void validaCamposEspecificosDeVida() {
+    assertThrows(IllegalArgumentException.class, () -> new SeguroVida(0, "POL-1",
+        LocalDate.of(2026, 8, 21), BigDecimal.TEN, EstadoSeguro.PENDIENTE,
+        asegurado, " ", "Hija"));
+    assertThrows(IllegalArgumentException.class, () -> new SeguroVida(0, "POL-1",
+        LocalDate.of(2026, 8, 21), BigDecimal.TEN, EstadoSeguro.PENDIENTE,
+        asegurado, "Ana", " "));
     }
 
     @Test
-    void conservaElSubtipoYValidaImportesEspecificos() {
-        Seguro vehiculo = new SeguroVehiculo(0, "P-1", "Auto", "", new BigDecimal("20"),
-                LocalDate.of(2026, 1, 1), LocalDate.of(2027, 1, 1), EstadoSeguro.PENDIENTE,
-                asegurado, "ABC123", "Marca", "Modelo", new BigDecimal("5000"));
+    void conservaHerenciaYValidaMarcaVehicular() {
+    Seguro vehiculo = new SeguroVehiculo(0, "POL-AUTO", LocalDate.of(2026, 8, 21),
+        new BigDecimal("5000"), EstadoSeguro.PENDIENTE, asegurado, "Marca");
         assertEquals("VEHICULO", vehiculo.getTipoSeguro());
-        assertThrows(IllegalArgumentException.class, () -> new SeguroVida(0, "P-2", "Vida", "",
-                BigDecimal.ZERO, LocalDate.of(2026, 1, 1), LocalDate.of(2027, 1, 1),
-                EstadoSeguro.PENDIENTE, asegurado, "Beneficiario", BigDecimal.ZERO));
+    assertThrows(IllegalArgumentException.class, () -> new SeguroVehiculo(0, "POL-AUTO",
+        LocalDate.of(2026, 8, 21), BigDecimal.ONE, EstadoSeguro.PENDIENTE, asegurado, " "));
     }
 
-    private SeguroVida crearVida(BigDecimal prima, LocalDate inicio, LocalDate fin) {
-        return new SeguroVida(0, "P-1", "Vida", "", prima, inicio, fin, EstadoSeguro.ACTIVO,
-                asegurado, "Beneficiario", new BigDecimal("1000"));
+    private SeguroVida crearVida(BigDecimal valor) {
+    return new SeguroVida(0, "POL-VIDA", LocalDate.of(2026, 8, 21), valor,
+        EstadoSeguro.ACTIVO, asegurado, "Beneficiario", "Hija");
     }
 }
