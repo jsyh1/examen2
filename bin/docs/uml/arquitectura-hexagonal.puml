@@ -1,0 +1,35 @@
+@startuml
+!pragma layout smetana
+skinparam componentStyle rectangle
+
+package "Dominio" {
+  [Seguro / SeguroVida / SeguroVehiculo]
+  [Asegurado]
+  [EstadoSeguro]
+}
+package "Aplicación" {
+  [Puertos de entrada]
+  [Servicios de aplicación]
+  interface "SeguroRepository" as Repo
+}
+package "Adaptadores" {
+  [JavaFX Controller]
+  [MysqlSeguroRepository JDBC]
+  [MySQL]
+}
+
+[JavaFX Controller] --> [Puertos de entrada]
+[Puertos de entrada] <|.. [Servicios de aplicación]
+[Servicios de aplicación] --> Repo
+[MysqlSeguroRepository JDBC] ..|> Repo
+[MysqlSeguroRepository JDBC] --> [MySQL]
+[Servicios de aplicación] ..> [Seguro / SeguroVida / SeguroVehiculo]
+[Servicios de aplicación] ..> [Asegurado]
+[Seguro / SeguroVida / SeguroVehiculo] --> [Asegurado]
+[Seguro / SeguroVida / SeguroVehiculo] --> [EstadoSeguro]
+
+note right of [Servicios de aplicación]
+  Depende del puerto de salida,
+  nunca de su adaptador JDBC.
+end note
+@enduml

@@ -1,0 +1,107 @@
+@startuml
+!pragma layout smetana
+skinparam classAttributeIconSize 0
+hide empty members
+
+package "co.edu.poli.aplication.domain.model" {
+  abstract class Seguro {
+    - id: int
+    - numeroPoliza: String
+    - nombre: String
+    - descripcion: String
+    - valorPrima: BigDecimal
+    - fechaInicio: LocalDate
+    - fechaFin: LocalDate
+    - estado: EstadoSeguro
+    + cambiarEstado(nuevoEstado: EstadoSeguro): void
+    + getTipoSeguro(): String
+  }
+  class SeguroVida {
+    - beneficiario: String
+    - valorCobertura: BigDecimal
+    + getTipoSeguro(): String
+  }
+  class SeguroVehiculo {
+    - placa: String
+    - marca: String
+    - modelo: String
+    - valorAsegurado: BigDecimal
+    + getTipoSeguro(): String
+  }
+  class Asegurado {
+    - id: int
+    - tipoDocumento: String
+    - numeroDocumento: String
+    - nombre: String
+    - telefono: String
+    - correo: String
+  }
+  enum EstadoSeguro {
+    ACTIVO
+    VENCIDO
+    CANCELADO
+    PENDIENTE
+    + permiteTransicionA(nuevoEstado: EstadoSeguro): boolean
+  }
+  Seguro <|-- SeguroVida
+  Seguro <|-- SeguroVehiculo
+  Seguro "*" --> "1" Asegurado : titular
+  Seguro --> EstadoSeguro
+}
+
+package "co.edu.poli.aplication.port.in" {
+  interface CrearSeguroUseCase
+  interface ConsultarSeguroPorIdUseCase
+  interface ConsultarSeguroPorPolizaUseCase
+  interface ListarSegurosUseCase
+  interface ActualizarSeguroUseCase
+  interface EliminarSeguroUseCase
+  interface ListarAseguradosUseCase
+}
+
+package "co.edu.poli.aplication.port.out" {
+  interface SeguroRepository {
+    + guardar(seguro: Seguro): Seguro
+    + actualizar(seguro: Seguro): Optional<Seguro>
+    + eliminarPorId(id: int): boolean
+    + buscarPorId(id: int): Optional<Seguro>
+    + buscarPorNumeroPoliza(numero: String): Optional<Seguro>
+    + buscarTodos(): List<Seguro>
+    + buscarAsegurados(): List<Asegurado>
+  }
+}
+
+package "co.edu.poli.aplication.service" {
+  class CrearSeguroService
+  class ActualizarSeguroService
+  class ConsultarSeguroPorIdService
+  class ConsultarSeguroPorPolizaService
+  class ListarSegurosService
+  class EliminarSeguroService
+  class ListarAseguradosService
+}
+
+package "co.edu.poli.infrastructure.persistence" {
+  class MysqlSeguroRepository
+  class ConexionDB
+}
+
+CrearSeguroUseCase <|.. CrearSeguroService
+ActualizarSeguroUseCase <|.. ActualizarSeguroService
+ConsultarSeguroPorIdUseCase <|.. ConsultarSeguroPorIdService
+ConsultarSeguroPorPolizaUseCase <|.. ConsultarSeguroPorPolizaService
+ListarSegurosUseCase <|.. ListarSegurosService
+EliminarSeguroUseCase <|.. EliminarSeguroService
+ListarAseguradosUseCase <|.. ListarAseguradosService
+CrearSeguroService --> SeguroRepository
+ActualizarSeguroService --> SeguroRepository
+ConsultarSeguroPorIdService --> SeguroRepository
+ConsultarSeguroPorPolizaService --> SeguroRepository
+ListarSegurosService --> SeguroRepository
+EliminarSeguroService --> SeguroRepository
+ListarAseguradosService --> SeguroRepository
+MysqlSeguroRepository ..|> SeguroRepository
+MysqlSeguroRepository --> ConexionDB
+MysqlSeguroRepository ..> SeguroVida : reconstruye
+MysqlSeguroRepository ..> SeguroVehiculo : reconstruye
+@enduml
