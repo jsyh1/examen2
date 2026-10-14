@@ -1,0 +1,50 @@
+@startuml
+!pragma layout smetana
+skinparam classAttributeIconSize 0
+hide empty members
+
+package "co.edu.poli.aplication.port.in" {
+  interface CrearSeguroUseCase
+  interface ConsultarSeguroPorIdUseCase
+  interface ListarSegurosUseCase
+  interface ActualizarSeguroUseCase
+  interface EliminarSeguroUseCase
+}
+package "co.edu.poli.aplication.service" {
+  class CrearSeguroService
+  class ConsultarSeguroPorIdService
+  class ListarSegurosService
+  class ActualizarSeguroService
+  class EliminarSeguroService
+}
+package "co.edu.poli.aplication.port.out" {
+  interface SeguroRepository
+}
+package "co.edu.poli.infrastructure.persistence" {
+  class MysqlSeguroRepository
+  class ConexionDB
+}
+package "co.edu.poli.aplication.domain.model" {
+  abstract class Seguro
+  class SeguroVida
+  class SeguroVehiculo
+  class Asegurado
+}
+
+CrearSeguroUseCase <|.. CrearSeguroService
+ConsultarSeguroPorIdUseCase <|.. ConsultarSeguroPorIdService
+ListarSegurosUseCase <|.. ListarSegurosService
+ActualizarSeguroUseCase <|.. ActualizarSeguroService
+EliminarSeguroUseCase <|.. EliminarSeguroService
+CrearSeguroService --> SeguroRepository
+ConsultarSeguroPorIdService --> SeguroRepository
+ListarSegurosService --> SeguroRepository
+ActualizarSeguroService --> SeguroRepository
+EliminarSeguroService --> SeguroRepository
+MysqlSeguroRepository ..|> SeguroRepository
+MysqlSeguroRepository --> ConexionDB
+MysqlSeguroRepository --> Seguro : mapea
+Seguro <|-- SeguroVida
+Seguro <|-- SeguroVehiculo
+Seguro --> Asegurado
+@enduml
